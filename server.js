@@ -3,6 +3,8 @@ var http 			= require('http').Server(app);
 var io 				= require('socket.io')(http);
 var base64 		= require('node-base64-image');
 var Promise 	= require('promise');
+var waterfall = require('async-waterfall');
+
 
 var Clarifai 	= require('./clarifai_node.js');
 
@@ -86,10 +88,10 @@ io.on('connection', function(socket) {
   socket.emit('hello', { hello: 'world' });
 
   socket.on('findMatch', function() {
-  	console.log(player + " wants to find a match.");
+  	console.log(socket.id + " wants to find a match.");
   	pool.push(socket.id);
 
-  	if (pool.length > 1) {
+  	if (pool.length >= 2) {
   		// Get from pool
   		var one = pool.shift();
   		var two = pool.shift();
@@ -100,25 +102,40 @@ io.on('connection', function(socket) {
   		clients[one].emit('foundMatch', {draw: 'test'});
   		clients[two].emit('foundMatch', {draw: 'test'});
   	}
+    printStuff();
   });
 
   // Remove socket from array when user disconencts
   socket.on('disconnect', function () {
-    socketIds.splice(socketIds.indexOf(socket.id), 1);
-    pool.splice(socketIds.indexOf(socket.id), 1);
-    delete clients[socket.id];
-
-    // If is in the pairs map
-    if (pairs[socket.id]) {
-    	var other = pairs[socket.id];
-    	pairs.splice(pairs.indexOf(socket.id), 1);
-    	pairs.splice(pairs.indexOf(other), 1);
-    } 
-    console.log('a user disconnected');
-    io.emit('user disconnected');
+	waterfall([
+		function() {
+			socketIds.splice(socketIds.indexOf(socket.id), 1);
+			pool.splice(socketIds.indexOf(socket.id), 1);
+			delete clients[socket.id];
+			// If is in the pairs map
+			if (pairs[socket.id]) {
+				var other = pairs[socket.id];
+				console.log(socket.id + "|" + other);
+				console.log(pairs.indexOf(socket.id) + "|" + pairs.indexOf(other));
+				console.log("size: " + pairs.length);
+				pairs.splice(pairs.indexOf(socket.id), 1);
+				pairs.splice(pairs.indexOf(other), 1);
+			} 
+			console.log('a user disconnected');
+			io.emit('user disconnected');
+			
+		},	
+		function() {
+			printStuff();
+		}	
+	]); 
   });
 
-  printStuff();
+  socket.on('message', function (message) {
+    console.log(message);
+  });
+  
+  
 });
 
 http.listen(3000, function(){
