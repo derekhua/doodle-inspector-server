@@ -13,34 +13,11 @@ var clientSec = "Ccw5CtVqNXsxa3jzgzFCzM4J4GWdrJoCwIabCNtb";
 
 Clarifai.initAPI(clientID, clientSec);
 
+var randomWords = ['cat', 'dog', 'basketball', 'car', 'airplane', 'park', 'house', 'computer', 'man', 'woman'];
+
 app.get('/', function(req, res) {
-	// var testImageURL = 'http://www.clarifai.com/img/metro-north.jpg';
-	// var xin = '@' + __dirname + "/photos/Xinhead.jpg";
-	// console.log(xin);
-	// var ourId = "train station 1"; // this is any string that identifies the image to your system
-
-	// var path = __dirname + '/photos/Xinhead.jpg',
- //          options = {localFile: true, string: true};
-
-	// base64.base64encoder(path, options, function (err, image) {  
- //    if (err) { console.log(err); }  
- //    console.log('Prob:');
-
-	// 	getProbs(image, 'train', ourId).then(function(res) {
-	// 		console.log("res.results[0].result");
-	// 		console.log(res.results[0].result);
-	// 		console.log(Math.max.apply(null, res.results[0].result.tag.probs));
-	// 	}).catch(function(err) {
-	// 		console.log(err);
-	// 	});
-	// });  
-
-	// res.send('On');
-
 	res.sendFile(__dirname + '/index.html');
 });
-
-
 
 function getProbs(data, class_name, ourId) {
 	return new Promise(function (resolve, reject) {
@@ -65,6 +42,7 @@ var pairs = {};
 // socketId -> prob
 var probMap = {};
 
+// Print data stores
 function printStuff() {
 	console.log('all clients');
 	for(var propertyName in clients) {
@@ -82,6 +60,7 @@ function printStuff() {
 	console.log('\n\n\n\n\n');
 }
 
+// Connection started
 io.on('connection', function(socket) {
 	console.log('a user connected');
 	console.log(socket.id);
@@ -90,8 +69,6 @@ io.on('connection', function(socket) {
 	clients[socket.id] = socket;
 	// Add id to array
   socketIds.push(socket.id);
-
-  socket.emit('hello', { hello: 'world' });
 
   socket.on('findMatch', function() {
   	console.log(socket.id + " wants to find a match.");
@@ -110,6 +87,12 @@ io.on('connection', function(socket) {
   		clients[two].emit('foundMatch', {draw: 'test'});
   	}
     printStuff();
+  });
+
+  socket.on('soloMatch', function() {
+  	console.log(socket.id + " wants to play single player.");
+  	var randomWord = randomWords[Math.floor(Math.random() * randomWords.length)];
+  	socket.emit('soloMatch', {"word": randomWord});
   });
 
   // Remove socket from array when user disconencts
@@ -144,14 +127,12 @@ io.on('connection', function(socket) {
 		]); 
   });
 
-  socket.on('message', function (message) {
-    console.log(message);
-  });
-
   socket.on('imageProb', function(image) {
   	console.log(image);
   	getProbs(image, 'cat', socket.id).then(function(res) {
-  		socket.emit('imageProb', {"result": Math.max.apply(null, res.results[0].result.tag.probs)});
+  		socket.emit('imageProb', {
+  			"result": Math.max.apply(null, res.results[0].result.tag.probs)
+  		});
   		console.log(Math.max.apply(null, res.results[0].result.tag.probs));
   	}).catch(function(err) {
   		console.log(err);
