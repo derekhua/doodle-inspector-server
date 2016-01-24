@@ -151,23 +151,23 @@ io.on('connection', function(socket) {
   			var one = probMap[socket.id];
   			var two = probMap[pairs[socket.id]];
   			if (one > two) {
-  				clients[one].emit('image1v1', {
+  				clients[socket.id].emit('image1v1', {
   					won: true,
   					yours: one,
   					theirs: two
   				});
-  				clients[two].emit('image1v1', {
+  				clients[pairs[socket.id]].emit('image1v1', {
   					won: false,
   					yours: two,
   					theirs: one
   				});
   			} else {
-  				clients[one].emit('image1v1', {
+  				clients[socket.id].emit('image1v1', {
   					won: false,
   					yours: one,
   					theirs: two
   				});
-  				clients[two].emit('image1v1', {
+  				clients[pairs[socket.id]].emit('image1v1', {
   					won: true,
   					yours: two,
   					theirs: one
