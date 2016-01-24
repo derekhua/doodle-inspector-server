@@ -130,7 +130,6 @@ io.on('connection', function(socket) {
   });
 
   socket.on('imageProb', function(image, word) {
-  	console.log(image);
     
   	getProbs(image, word, socket.id).then(function(res) {
   		socket.emit('imageProb', {
@@ -150,6 +149,8 @@ io.on('connection', function(socket) {
   		if (probMap[pairs[socket.id]]) {
   			var one = probMap[socket.id];
   			var two = probMap[pairs[socket.id]];
+  			console.log("Player1: " + one);
+  			console.log("Player2: " + two);
   			if (one > two) {
   				clients[socket.id].emit('image1v1', {
   					won: true,
@@ -180,8 +181,8 @@ io.on('connection', function(socket) {
   			delete probMap[pairs[socket.id]];
   			
   			// Delete pairs
-  			delete pair[pair[socket.id]];
-  			delete pair[socket.id];
+  			delete pairs[pairs[socket.id]];
+  			delete pairs[socket.id];
   		}
   	}).catch(function(err) {
   		console.log(err);
