@@ -149,6 +149,7 @@ io.on('connection', function(socket) {
   });
 
   socket.on('imageProb', function(image) {
+  	console.log(image);
   	getProbs(data, class_name, ourId).then(function(res) {
   		socket.emit('imageProb', {"result": Math.max.apply(null, res.results[0].result.tag.probs)});
   		console.log(Math.max.apply(null, res.results[0].result.tag.probs));
