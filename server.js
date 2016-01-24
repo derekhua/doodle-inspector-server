@@ -54,14 +54,16 @@ function getProbs(data, class_name, ourId) {
 	});
 }
 
-// Object map
+// socketId -> socketId
 var clients = {};
 // Array
 var socketIds = [];
 // Queue
 var pool = [];
-// Object map
+// socketId -> socketId
 var pairs = {};
+// socketId -> prob
+var probMap = {};
 
 function printStuff() {
 	console.log('all clients');
@@ -145,7 +147,41 @@ io.on('connection', function(socket) {
   socket.on('message', function (message) {
     console.log(message);
   });
-    
+
+  socket.on('imageProb', function(image) {
+  	getProbs(data, class_name, ourId).then(function(res) {
+  		socket.emit('imageProb', {"result": Math.max.apply(null, res.results[0].result.tag.probs)});
+  		console.log(Math.max.apply(null, res.results[0].result.tag.probs));
+  	}).catch(function(err) {
+  		console.log(err);
+  	});
+  });
+	
+  socket.on('image1v1', function(image) {
+  	getProbs(data, class_name, '').then(function(res) {
+  		probMap[socket.id] = Math.max.apply(null, res.results[0].result.tag.probs);
+  		// Both submitted
+  		if (probMap[pairs[socket.id]]) {
+  			var one = probMap[socket.id];
+  			var two = probMap[pairs[socket.id]];
+  			if (one > two) {
+  				clients[one].emit('won', {won: true});
+  				clients[two].emit('won', {won: false});
+  			} else {
+  				clients[one].emit('won', {won: false});
+  				clients[two].emit('won', {won: true});
+  			}
+  			delete probMap[socket.id];
+  			delete probMap[pairs[socket.id]];
+  			
+  			delete pair[pair[socket.id]];
+  			delete pair[socket.id];
+  		}
+  	}).catch(function(err) {
+  		console.log(err);
+  	});
+  });
+
 });
 
 http.listen(3000, function(){
