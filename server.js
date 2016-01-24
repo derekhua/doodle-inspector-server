@@ -129,11 +129,13 @@ io.on('connection', function(socket) {
 		]); 
   });
 
-  socket.on('imageProb', function(image) {
+  socket.on('imageProb', function(image, word) {
   	console.log(image);
-  	getProbs(image, 'cat', socket.id).then(function(res) {
+    
+  	getProbs(image, word, socket.id).then(function(res) {
   		socket.emit('imageProb', {
-  			"result": Math.max.apply(null, res.results[0].result.tag.probs)
+  			"result": Math.max.apply(null, res.results[0].result.tag.probs),
+        "word": word
   		});
   		console.log(Math.max.apply(null, res.results[0].result.tag.probs));
   	}).catch(function(err) {
