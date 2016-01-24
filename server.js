@@ -150,7 +150,7 @@ io.on('connection', function(socket) {
 
   socket.on('imageProb', function(image) {
   	console.log(image);
-  	getProbs(image, class_name, ourId).then(function(res) {
+  	getProbs(image, 'cat', 'ourId').then(function(res) {
   		socket.emit('imageProb', {"result": Math.max.apply(null, res.results[0].result.tag.probs)});
   		console.log(Math.max.apply(null, res.results[0].result.tag.probs));
   	}).catch(function(err) {
@@ -159,7 +159,7 @@ io.on('connection', function(socket) {
   });
 	
   socket.on('image1v1', function(image) {
-  	getProbs(data, class_name, '').then(function(res) {
+  	getProbs(data, 'cat', 'ourId').then(function(res) {
   		probMap[socket.id] = Math.max.apply(null, res.results[0].result.tag.probs);
   		// Both submitted
   		if (probMap[pairs[socket.id]]) {
