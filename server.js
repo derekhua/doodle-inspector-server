@@ -61,9 +61,6 @@ var pool = [];
 var pairs = [];
 
 function printStuff() {
-	console.log('-------------');
-	console.log('-------------');
-	console.log('-------------');
 	console.log('all socketIds');
 	console.log(socketIds);
 	console.log('-------------');
