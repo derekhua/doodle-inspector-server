@@ -54,11 +54,14 @@ function getProbs(data, class_name, ourId) {
 	});
 }
 
-
+// Object map
 var clients = {};
+// Array
 var socketIds = [];
+// Queue
 var pool = [];
-var pairs = [];
+// Object map
+var pairs = {};
 
 function printStuff() {
 	console.log('all socketIds');
@@ -89,12 +92,13 @@ io.on('connection', function(socket) {
   	pool.push(socket.id);
 
   	if (pool.length >= 2) {
+  		console.log("Match found!");
   		// Get from pool
   		var one = pool.shift();
   		var two = pool.shift();
   		// Add to map
-  		pairs[one] = two;
-  		pairs[two] = one;
+  		pairs.one = two;
+  		pairs.two = one;
   		// Emit messages
   		clients[one].emit('foundMatch', {draw: 'test'});
   		clients[two].emit('foundMatch', {draw: 'test'});
@@ -104,6 +108,7 @@ io.on('connection', function(socket) {
 
   // Remove socket from array when user disconencts
   socket.on('disconnect', function () {
+  	console.log('a user disconnected');
 		waterfall([
 			function(callback) {
 				socketIds.splice(socketIds.indexOf(socket.id), 1);		
@@ -121,19 +126,11 @@ io.on('connection', function(socket) {
 				// If is in the pairs map
 				if (pairs[socket.id]) {
 					var other = pairs[socket.id];
-					console.log(socket.id + "|" + other);
-					console.log(pairs.indexOf(socket.id) + "|" + pairs.indexOf(other));
-					console.log("size: " + pairs.length);
-					pairs.splice(pairs.indexOf(socket.id), 1);
-					pairs.splice(pairs.indexOf(other), 1);
+					delete pairs[socket.id];
+					delete pairs[other];
 				} 
 				callback();
-			},
-			function(callback) {
-				console.log('a user disconnected');
-				io.emit('user disconnected');
-				callback();
-			},
+			},		
 			function(callback) {
 				console.log('STUFF');
 				printStuff();
