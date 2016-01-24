@@ -13,7 +13,7 @@ var clientSec = "Ccw5CtVqNXsxa3jzgzFCzM4J4GWdrJoCwIabCNtb";
 
 Clarifai.initAPI(clientID, clientSec);
 
-var randomWords = ['cat', 'dog', 'basketball', 'car', 'airplane', 'park', 'house', 'computer', 'man', 'woman'];
+var randomWords = ['cat', 'dog', 'basketball', 'car', 'airplane', 'park', 'house', 'computer', 'man', 'woman', 'balloon', 'carrot', 'banana', 'table', 'water', 'sun', 'flower', 'chair', 'tree', 'city'];
 
 app.get('/', function(req, res) {
 	res.sendFile(__dirname + '/index.html');
@@ -148,7 +148,7 @@ io.on('connection', function(socket) {
   		probMap[socket.id] = Math.max.apply(null, res.results[0].result.tag.probs);
   		// Both submitted
   		if (probMap[pairs[socket.id]]) {
-  			var one = probMap[socket.id];
+  			var one = p  robMap[socket.id];
   			var two = probMap[pairs[socket.id]];
   			if (one > two) {
   				clients[socket.id].emit('image1v1', {
