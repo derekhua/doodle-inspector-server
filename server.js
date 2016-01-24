@@ -148,7 +148,7 @@ io.on('connection', function(socket) {
   		probMap[socket.id] = Math.max.apply(null, res.results[0].result.tag.probs);
   		// Both submitted
   		if (probMap[pairs[socket.id]]) {
-  			var one = p  robMap[socket.id];
+  			var one = probMap[socket.id];
   			var two = probMap[pairs[socket.id]];
   			if (one > two) {
   				clients[socket.id].emit('image1v1', {
