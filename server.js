@@ -61,9 +61,9 @@ var pool = [];
 var pairs = [];
 
 function printStuff() {
+	console.log();
 	console.log('-------------');
-	console.log('all clients');
-	console.log(clients);
+	console.log('-------------');
 	console.log('-------------');
 	console.log('all socketIds');
 	console.log(socketIds);
@@ -107,28 +107,42 @@ io.on('connection', function(socket) {
 
   // Remove socket from array when user disconencts
   socket.on('disconnect', function () {
-	waterfall([
-		function() {
-			socketIds.splice(socketIds.indexOf(socket.id), 1);
-			pool.splice(socketIds.indexOf(socket.id), 1);
-			delete clients[socket.id];
-			// If is in the pairs map
-			if (pairs[socket.id]) {
-				var other = pairs[socket.id];
-				console.log(socket.id + "|" + other);
-				console.log(pairs.indexOf(socket.id) + "|" + pairs.indexOf(other));
-				console.log("size: " + pairs.length);
-				pairs.splice(pairs.indexOf(socket.id), 1);
-				pairs.splice(pairs.indexOf(other), 1);
-			} 
-			console.log('a user disconnected');
-			io.emit('user disconnected');
-			
-		},	
-		function() {
-			printStuff();
-		}	
-	]); 
+		waterfall([
+			function() {
+				socketIds.splice(socketIds.indexOf(socket.id), 1);		
+				callback();
+			}, 
+			function() {
+				pool.splice(socketIds.indexOf(socket.id), 1);
+				callback();
+			}, 
+			function() {
+				delete clients[socket.id];
+				callback();
+			}, 
+			function() {
+				// If is in the pairs map
+				if (pairs[socket.id]) {
+					var other = pairs[socket.id];
+					console.log(socket.id + "|" + other);
+					console.log(pairs.indexOf(socket.id) + "|" + pairs.indexOf(other));
+					console.log("size: " + pairs.length);
+					pairs.splice(pairs.indexOf(socket.id), 1);
+					pairs.splice(pairs.indexOf(other), 1);
+				} 
+				callback();
+			},
+			function() {
+				console.log('a user disconnected');
+				io.emit('user disconnected');
+				callback();
+			},
+			function() {
+				console.log('STUFF');
+				printStuff();
+				callback();
+			}	
+		]); 
   });
 
   socket.on('message', function (message) {
