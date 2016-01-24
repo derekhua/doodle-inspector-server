@@ -61,7 +61,7 @@ var pool = [];
 var pairs = [];
 
 function printStuff() {
-	console.log();
+	console.log('\n\n\n\n\n');
 	console.log('-------------');
 	console.log('-------------');
 	console.log('-------------');
@@ -148,6 +148,8 @@ io.on('connection', function(socket) {
     console.log(message);
   });
   
+
+  printStuff();
   
 });
 
