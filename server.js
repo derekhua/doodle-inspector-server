@@ -82,9 +82,11 @@ io.on('connection', function(socket) {
   		// Add to map
   		pairs[one] = two;
   		pairs[two] = one;
+
+  		var randomWord = randomWords[Math.floor(Math.random() * randomWords.length)];
   		// Emit messages
-  		clients[one].emit('foundMatch', {draw: 'test'});
-  		clients[two].emit('foundMatch', {draw: 'test'});
+  		clients[one].emit('findMatch', {"word": randomWord});
+  		clients[two].emit('findMatch', {"word": randomWord});
   	}
     printStuff();
   });
@@ -147,15 +149,35 @@ io.on('connection', function(socket) {
   			var one = probMap[socket.id];
   			var two = probMap[pairs[socket.id]];
   			if (one > two) {
-  				clients[one].emit('won', {won: true});
-  				clients[two].emit('won', {won: false});
+  				clients[one].emit('image1v1', {
+  					won: true,
+  					yours: one,
+  					theirs: two
+  				});
+  				clients[two].emit('image1v1', {
+  					won: false,
+  					yours: two,
+  					theirs: one
+  				});
   			} else {
-  				clients[one].emit('won', {won: false});
-  				clients[two].emit('won', {won: true});
+  				clients[one].emit('image1v1', {
+  					won: false,
+  					yours: one,
+  					theirs: two
+  				});
+  				clients[two].emit('image1v1', {
+  					won: true,
+  					yours: two,
+  					theirs: one
+  				});
   			}
+  			
+  			// Clean-up
+  			// Delete prob results
   			delete probMap[socket.id];
   			delete probMap[pairs[socket.id]];
   			
+  			// Delete pairs
   			delete pair[pair[socket.id]];
   			delete pair[socket.id];
   		}
