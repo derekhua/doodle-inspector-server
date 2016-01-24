@@ -61,7 +61,6 @@ var pool = [];
 var pairs = [];
 
 function printStuff() {
-	console.log('\n\n\n\n\n');
 	console.log('-------------');
 	console.log('-------------');
 	console.log('-------------');
@@ -74,6 +73,7 @@ function printStuff() {
 	console.log('pairs');
 	console.log(pairs);
 	console.log('-------------');
+	console.log('\n\n\n\n\n');
 }
 
 io.on('connection', function(socket) {
@@ -147,10 +147,7 @@ io.on('connection', function(socket) {
   socket.on('message', function (message) {
     console.log(message);
   });
-  
-
-  printStuff();
-  
+    
 });
 
 http.listen(3000, function(){
