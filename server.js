@@ -64,6 +64,10 @@ var pool = [];
 var pairs = {};
 
 function printStuff() {
+	console.log('all clients');
+	for(var propertyName in clients) {
+ 		console.log(propertyName);
+	}
 	console.log('all socketIds');
 	console.log(socketIds);
 	console.log('-------------');
@@ -97,8 +101,8 @@ io.on('connection', function(socket) {
   		var one = pool.shift();
   		var two = pool.shift();
   		// Add to map
-  		pairs.one = two;
-  		pairs.two = one;
+  		pairs[one] = two;
+  		pairs[two] = one;
   		// Emit messages
   		clients[one].emit('foundMatch', {draw: 'test'});
   		clients[two].emit('foundMatch', {draw: 'test'});
