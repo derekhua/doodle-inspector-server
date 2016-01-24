@@ -108,19 +108,19 @@ io.on('connection', function(socket) {
   // Remove socket from array when user disconencts
   socket.on('disconnect', function () {
 		waterfall([
-			function() {
+			function(callback) {
 				socketIds.splice(socketIds.indexOf(socket.id), 1);		
 				callback();
 			}, 
-			function() {
+			function(callback) {
 				pool.splice(socketIds.indexOf(socket.id), 1);
 				callback();
 			}, 
-			function() {
+			function(callback) {
 				delete clients[socket.id];
 				callback();
 			}, 
-			function() {
+			function(callback) {
 				// If is in the pairs map
 				if (pairs[socket.id]) {
 					var other = pairs[socket.id];
@@ -132,15 +132,14 @@ io.on('connection', function(socket) {
 				} 
 				callback();
 			},
-			function() {
+			function(callback) {
 				console.log('a user disconnected');
 				io.emit('user disconnected');
 				callback();
 			},
-			function() {
+			function(callback) {
 				console.log('STUFF');
 				printStuff();
-				callback();
 			}	
 		]); 
   });
