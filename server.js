@@ -143,8 +143,8 @@ io.on('connection', function(socket) {
   	});
   });
 	
-  socket.on('image1v1', function(image) {
-  	getProbs(data, 'cat', socket.id).then(function(res) {
+  socket.on('image1v1', function(image, word) {
+  	getProbs(image, word, socket.id).then(function(res) {
   		probMap[socket.id] = Math.max.apply(null, res.results[0].result.tag.probs);
   		// Both submitted
   		if (probMap[pairs[socket.id]]) {
